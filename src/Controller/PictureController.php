@@ -27,10 +27,13 @@ class PictureController extends AbstractController
     }
 
     #[Route('/api/pictures/{idPicture}', name: 'pictures.get', methods: ['GET'], )]
-    public function getPicture(int $idPicture, PictureRepository $pictureRepository,SerializerInterface $serializer,UrlGeneratorInterface $urlGenerator) : JsonResponse
+    public function getPicture(int $idPicture, Request $request, PictureRepository $pictureRepository,SerializerInterface $serializer,UrlGeneratorInterface $urlGenerator) : JsonResponse
     {
         $picture = $pictureRepository->find($idPicture);
 
+        $relativePath = $picture->getPublicPath(). "/" . $picture->getPictureURL();
+        $location = $request->getUriForPath('/');
+        $location = $location . str_replace("/assets", "assets",$relativePath);
         if ($picture) {
             return new JsonResponse($serializer->serialize($picture, 'json', [AbstractNormalizer::GROUPS => 'getPicture']), JsonResponse::HTTP_OK,[],true);
         }
@@ -38,7 +41,11 @@ class PictureController extends AbstractController
     }
 
     #[Route('/api/pictures', name: 'pictures.create', methods: ['POST'], )]
-    public function createPicture(ValidatorInterface $validator, EntityManagerInterface $entityManager,Request $request,SerializerInterface $serializer,UrlGeneratorInterface $urlGenerator) : JsonResponse
+    public function createPicture(ValidatorInterface $validator,
+                                  EntityManagerInterface $entityManager,
+                                  Request $request,SerializerInterface $serializer,
+                                  UrlGeneratorInterface $urlGenerator
+                                ) : JsonResponse
     {
         //dd($request);
         $picture = new Picture();
@@ -46,7 +53,7 @@ class PictureController extends AbstractController
         $picture->setFile($files);
         $picture->setMimeType($files->getClientMimeType());
         $picture->setPictureName($files->getClientOriginalName());
-        $picture->setPublicPath("/assets/picture");
+        $picture->setPublicPath("/assets/pictures");
         $picture->setStatus("on");
         $entityManager->persist($picture);
         $entityManager->flush();

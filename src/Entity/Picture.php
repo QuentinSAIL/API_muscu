@@ -42,8 +42,8 @@ class Picture
     private ?string $status = null;
 
     /**
-     * @ar File|null
-     * @Vich\UploadableField(mapping="pictures" fileNameProperty="picture_url")
+     * @var File|null
+     * @Vich\UploadableField(mapping="pictures", fileNameProperty="picture_url")
      */
     private ?File $file;
 
