@@ -6,6 +6,7 @@ use App\Repository\PictureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: PictureRepository::class)]
@@ -17,21 +18,27 @@ class Picture
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getPicture'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getPicture'])]
     private ?string $pictureName = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['getPicture'])]
     private ?string $pictureURL = null; // real_path
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getPicture'])]
     private ?string $public_path = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['getPicture'])]
     private ?string $mimeType = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['getPicture'])]
     private ?string $status = null;
 
     /**
