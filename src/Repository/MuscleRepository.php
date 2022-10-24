@@ -70,6 +70,14 @@ class MuscleRepository extends ServiceEntityRepository
 //           ->setParameter('status', 'on');
 //   }
 
+    /**
+     *
+     * retourne les étudiants paginée
+     * @param $page
+     * @param $limit d'étudiant par page
+     * @return array
+     */
+
     public function findWithPagination($page, $limit) {
         $qb = $this->createQueryBuilder('m')
             ->andWhere('m.status = :status')

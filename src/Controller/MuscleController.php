@@ -17,6 +17,7 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MuscleController extends AbstractController
 {
@@ -30,6 +31,13 @@ class MuscleController extends AbstractController
     }
 
 
+    /**
+     * Retourne la liste des muscles
+     * @param MuscleRepository $repository
+     * @param SerializerInterface $serializer
+     * @param Request $request à besoin de paramétrer $limit et $page
+     * @return JsonResponse
+     */
     #[Route('/api/muscles', name: 'muscles.getAll', methods: ['GET'], )]
     public function getAllMuscle(MuscleRepository $repository,SerializerInterface $serializer, Request $request) : JsonResponse
     {
@@ -65,7 +73,7 @@ class MuscleController extends AbstractController
 
     #[Route('/api/muscle', name: 'muscle.create', methods: ['POST'])]
     #[ParamConverter("muscle",options: ["id" => "idMuscle"])]
-    public function createMuscle(RegionRepository $regionRepository, EntityManagerInterface $entityManager,Request $request,SerializerInterface $serializer,UrlGeneratorInterface $urlGenerator) : JsonResponse
+    public function createMuscle(RegionRepository $regionRepository, ValidatorInterface $validator, EntityManagerInterface $entityManager,Request $request,SerializerInterface $serializer,UrlGeneratorInterface $urlGenerator) : JsonResponse
     {
         $muscle = $serializer->deserialize($request->getContent(),Muscle::class, 'json', [AbstractNormalizer::GROUPS => 'createMuscle']);
         $muscle->setStatus('on');
@@ -73,8 +81,6 @@ class MuscleController extends AbstractController
         $content = $request->toArray();
         $regionID = $content["region_id"];
         $muscle->setRegionID($regionRepository->find($regionID));
-
-        $validator = Validation::createValidator();
 
         $errors = $validator->validate($muscle);
         if ($errors -> count() > 0){
