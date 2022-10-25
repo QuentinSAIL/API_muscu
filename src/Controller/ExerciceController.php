@@ -43,6 +43,7 @@ class ExerciceController extends AbstractController
     public function getExercice(SerializerInterface $serializer,Exercice $exercice) : JsonResponse
     {
         $jsonExercice = $serializer->serialize($exercice, 'json',["groups => getExercice"]);
+        dd($jsonExercice);
         return new JsonResponse($jsonExercice, Response::HTTP_OK,["accept"=>"json"],true);
     }
 }

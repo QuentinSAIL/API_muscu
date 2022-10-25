@@ -31,7 +31,7 @@ class PictureController extends AbstractController
     {
         $picture = $pictureRepository->find($idPicture);
 
-        $relativePath = $picture->getPublicPath(). "/" . $picture->getPictureURL();
+        $relativePath = $picture->getPublicPath(). "/" . $picture-> getPictureURL();
         $location = $request->getUriForPath('/');
         $location = $location . str_replace("/assets", "assets",$relativePath);
         if ($picture) {
@@ -53,7 +53,7 @@ class PictureController extends AbstractController
         $picture->setFile($files);
         $picture->setMimeType($files->getClientMimeType());
         $picture->setPictureName($files->getClientOriginalName());
-        $picture->setPublicPath("/assets/pictures");
+        $picture->setPublicPath("/assets");
         $picture->setStatus("on");
         $entityManager->persist($picture);
         $entityManager->flush();

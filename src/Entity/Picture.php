@@ -5,13 +5,14 @@ namespace App\Entity;
 use App\Repository\PictureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Vich\UploaderBundle\Mapping\Annotation\Uploadable;
+use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
 
 #[ORM\Entity(repositoryClass: PictureRepository::class)]
 /**
- * @Vich\Uploadable()
+ * @Uploadable()
  */
 class Picture
 {
@@ -43,7 +44,7 @@ class Picture
 
     /**
      * @var File|null
-     * @Vich\UploadableField(mapping="pictures", fileNameProperty="picture_url")
+     *@UploadableField(mapping="filemap", fileNameProperty="pictureURL")
      */
     private ?File $file;
 
