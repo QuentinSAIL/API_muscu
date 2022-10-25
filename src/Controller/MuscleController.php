@@ -5,6 +5,7 @@ use App\Entity\Muscle;
 use App\Repository\MuscleRepository;
 use App\Repository\RegionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -72,6 +73,7 @@ class MuscleController extends AbstractController
 
 
     #[Route('/api/muscle', name: 'muscle.create', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'il faut être admin')]
     #[ParamConverter("muscle",options: ["id" => "idMuscle"])]
     public function createMuscle(RegionRepository $regionRepository, ValidatorInterface $validator, EntityManagerInterface $entityManager,Request $request,SerializerInterface $serializer,UrlGeneratorInterface $urlGenerator) : JsonResponse
     {

@@ -5,10 +5,12 @@ namespace App\DataFixtures;
 use App\Entity\Exercice;
 use App\Entity\Muscle;
 use App\Entity\Region;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Generator;
 use Faker\Factory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
@@ -18,31 +20,42 @@ class AppFixtures extends Fixture
      */
     private Generator $faker;
 
-    public function __construct()
+    /*
+     * classe qui hash les mdp
+     * @var UserPasswordHasherInterface
+     */
+    private $userPasswordHasher;
+
+
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher)
     {
         $this->faker = Factory::create("fr_FR");
+        $this->userPasswordHasher = $userPasswordHasher;
     }
 
     public function load(ObjectManager $manager): void
     {
-        for ($i=0; $i < 20; $i++) {
-            $exercice = new Exercice();
-            $exercice->setExerciceName($this->faker->word())
-            ->setExerciceDescription($this->faker->text(30))
-            ->setStatus('on')
-            ->setExercicePicture('rien')
-            ->setExerciceURL('rien');
-            $manager->persist($exercice);
+        $userNumber = 10;
 
-            $region = new Region();
-            $region->setRegionName($this->faker->word())
-                ->setRegionPicture("ok");
-            $manager->persist($region);
+        //authent
+        $adminUSer = new User();
+        $password = "password";
+        $adminUSer->setEmail("admin@email")
+            ->setPassword($this->userPasswordHasher->hashPassword($adminUSer, $password))
+            ->setRoles(["ROLE_ADMIN"]);
+        $manager->persist($adminUSer);
 
-            $muscle = new Muscle();
-            $muscle->setMuscleName($this->faker->word())
-                ->setRegionID($region);
-            $manager->persist($muscle);
+        //user
+
+        for ($i=0; $i < $userNumber; $i++) {
+            $userUser = new User();
+            $password = $this->faker->password(2,6);
+
+            $userUser->setEmail($this->faker->email() . '@' . $password)
+                ->setRoles(["ROLE_USER"])
+                ->setPassword($this->userPasswordHasher->hashPassword($userUser, $password));
+            $manager->persist($userUser);
+
         }
         $manager->flush();
     }
