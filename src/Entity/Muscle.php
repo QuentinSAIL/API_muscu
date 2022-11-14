@@ -9,6 +9,24 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Hateoas\Configuration\Annotation as Hateoas;
+use Hateoas\Configuration\Annotation\Relation;
+use Hateoas\Configuration\Annotation\Route;
+use Hateoas\Configuration\Annotation\Exclusion;
+
+/**
+ * @Relation(
+ *     "self",
+ *     href=@Route(
+ *     "muscle.get",
+ *     parameters= {
+ *     "idMuscle" = "exprt(object.getId())"
+ *     }
+ *     ),
+ *     exclusion = @Exclusion(groups="getMuscle")
+ *    )
+ */
+
 
 #[ORM\Entity(repositoryClass: MuscleRepository::class)]
 class Muscle
