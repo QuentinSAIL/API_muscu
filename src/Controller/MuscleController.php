@@ -40,6 +40,7 @@ class MuscleController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/api/muscles', name: 'muscles.getAll', methods: ['GET'], )]
+    #[IsGranted('ROLE_ADMIN', message: 'il faut être admin')]
     public function getAllMuscle(MuscleRepository $repository,SerializerInterface $serializer, Request $request) : JsonResponse
     {
         //$muscles = $repository->findAll();

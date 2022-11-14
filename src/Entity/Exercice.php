@@ -41,9 +41,21 @@ class Exercice
     #[ORM\ManyToMany(targetEntity: Muscle::class, inversedBy: 'exercices')]
     private Collection $muscleID;
 
+    #[ORM\OneToMany(mappedBy: 'idExercice', targetEntity: ExerciceMuscle::class)]
+    private Collection $exerciceMuscles;
+
+    #[ORM\ManyToMany(targetEntity: muscle::class, inversedBy: 'exercice')]
+    private Collection $idMuscle;
+
+    #[ORM\ManyToMany(targetEntity: muscle::class)]
+    private Collection $MuscleID;
+
     public function __construct()
     {
         $this->muscleID = new ArrayCollection();
+        $this->exerciceMuscles = new ArrayCollection();
+        $this->idMuscle = new ArrayCollection();
+        $this->MuscleID = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,6 +143,60 @@ class Exercice
     public function removeMuscleID(Muscle $muscleID): self
     {
         $this->muscleID->removeElement($muscleID);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ExerciceMuscle>
+     */
+    public function getExerciceMuscles(): Collection
+    {
+        return $this->exerciceMuscles;
+    }
+
+    public function addExerciceMuscle(ExerciceMuscle $exerciceMuscle): self
+    {
+        if (!$this->exerciceMuscles->contains($exerciceMuscle)) {
+            $this->exerciceMuscles->add($exerciceMuscle);
+            $exerciceMuscle->setIdExercice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExerciceMuscle(ExerciceMuscle $exerciceMuscle): self
+    {
+        if ($this->exerciceMuscles->removeElement($exerciceMuscle)) {
+            // set the owning side to null (unless already changed)
+            if ($exerciceMuscle->getIdExercice() === $this) {
+                $exerciceMuscle->setIdExercice(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, muscle>
+     */
+    public function getIdMuscle(): Collection
+    {
+        return $this->idMuscle;
+    }
+
+    public function addIdMuscle(muscle $idMuscle): self
+    {
+        if (!$this->idMuscle->contains($idMuscle)) {
+            $this->idMuscle->add($idMuscle);
+        }
+
+        return $this;
+    }
+
+    public function removeIdMuscle(muscle $idMuscle): self
+    {
+        $this->idMuscle->removeElement($idMuscle);
 
         return $this;
     }

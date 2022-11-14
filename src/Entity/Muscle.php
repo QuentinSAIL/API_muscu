@@ -50,9 +50,17 @@ class Muscle
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Picture $pictureID = null;
 
+    #[ORM\OneToMany(mappedBy: 'muscleExercice', targetEntity: ExerciceMuscle::class)]
+    private Collection $exerciceMuscles;
+
+    #[ORM\ManyToMany(targetEntity: Exercice::class, mappedBy: 'idMuscle')]
+    private Collection $exercice;
+
     public function __construct()
     {
         $this->exercices = new ArrayCollection();
+        $this->exerciceMuscles = new ArrayCollection();
+        $this->exercice = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -133,5 +141,43 @@ class Muscle
         $this->pictureID = $pictureID;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, ExerciceMuscle>
+     */
+    public function getExerciceMuscles(): Collection
+    {
+        return $this->exerciceMuscles;
+    }
+
+    public function addExerciceMuscle(ExerciceMuscle $exerciceMuscle): self
+    {
+        if (!$this->exerciceMuscles->contains($exerciceMuscle)) {
+            $this->exerciceMuscles->add($exerciceMuscle);
+            $exerciceMuscle->setMuscleExercice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExerciceMuscle(ExerciceMuscle $exerciceMuscle): self
+    {
+        if ($this->exerciceMuscles->removeElement($exerciceMuscle)) {
+            // set the owning side to null (unless already changed)
+            if ($exerciceMuscle->getMuscleExercice() === $this) {
+                $exerciceMuscle->setMuscleExercice(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Exercice>
+     */
+    public function getExercice(): Collection
+    {
+        return $this->exercice;
     }
 }
