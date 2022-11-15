@@ -7,7 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Exercice>
+ * @extends ServiceEntityRepository<TestEntity>
  *
  * @method Exercice|null find($id, $lockMode = null, $lockVersion = null)
  * @method Exercice|null findOneBy(array $criteria, array $orderBy = null)
@@ -40,24 +40,24 @@ class ExerciceRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Exercice[] Returns an array of Exercice objects
+//     * @return TestEntity[] Returns an array of TestEntity objects
 //     */
 //    public function findByExampleField($value): array
 //    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
+//        return $this->createQueryBuilder('t')
+//            ->andWhere('t.exampleField = :val')
 //            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
+//            ->orderBy('t.id', 'ASC')
 //            ->setMaxResults(10)
 //            ->getQuery()
 //            ->getResult()
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Exercice
+//    public function findOneBySomeField($value): ?TestEntity
 //    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
+//        return $this->createQueryBuilder('t')
+//            ->andWhere('t.exampleField = :val')
 //            ->setParameter('val', $value)
 //            ->getQuery()
 //            ->getOneOrNullResult()

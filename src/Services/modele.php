@@ -10,7 +10,7 @@ class modele
     }
 
     public function getExerciceByMuscle($IDmuscle) {
-        $requetePreparee = $this->connexion->prepare('SELECT * FROM exercice INNER JOIN exercice_muscle ON exercice.id = exercice_muscle.IDexercice WHERE IDmuscle = :paramIDmuscle');
+        $requetePreparee = $this->connexion->prepare('SELECT * FROM exercice INNER JOIN exercice_muscles ON exercice.id = exercice_muscles.IDexercice WHERE IDmuscle = :paramIDmuscle');
         $requetePreparee->bindParam('paramIDmuscle',$IDmuscle);
         $requetePreparee->execute();
         return $requetePreparee->fetchAll(PDO::FETCH_ASSOC);

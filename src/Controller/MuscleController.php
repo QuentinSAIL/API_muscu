@@ -6,25 +6,17 @@ use App\Entity\Muscle;
 use App\Repository\MuscleRepository;
 use App\Repository\RegionRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\DocBlock\Serializer;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-//use Symfony\Component\Serializer\SerializerInterface;
-use JMS\Serializer\SerializerInterface;
-use JMS\Serializer\SerializationContext;
-
-
-use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -32,11 +24,10 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 class MuscleController extends AbstractController
 {
     #[Route('/muscle', name: 'app_muscle')]
-    public function index(): JsonResponse
+    public function index(): Response
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/MuscleController.php',
+        return $this->render('muscle/index.html.twig', [
+            'controller_name' => 'MuscleController',
         ]);
     }
 
@@ -48,7 +39,7 @@ class MuscleController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/api/muscles', name: 'muscles.getAll', methods: ['GET'],)]
-    #[IsGranted('ROLE_ADMIN', message: 'il faut être admin')]
+    #[IsGranted('ROLE_ADMIN', message: 'y faut être admin')]
     public function getAllMuscle(MuscleRepository $repository, SerializerInterface $serializer, Request $request): JsonResponse
     {
         //$muscles = $repository->findAll();
@@ -56,26 +47,46 @@ class MuscleController extends AbstractController
         $limit = $request->get('limit', 5);
         $limit = $limit > 20 ? 20 : $limit;
         $muscles = $repository->findWithPagination($page, $limit);
-        $context = SerializationContext::create()->setGroups(['getMuscleAll']);
-
-        $JsonMuscles = $serializer->serialize($muscles, 'json', $context);
+        $JsonMuscles = $serializer->serialize($muscles, 'json');
+//        dd($JsonMuscles);
         return new JsonResponse($JsonMuscles, Response::HTTP_OK, [], true);
     }
 
 
     #[Route('/api/muscle/{idMuscle}', name: 'muscle.get', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN', message: 'il faut être admin')]
+    #[IsGranted('ROLE_ADMIN', message: 'y faut être admin')]
     #[ParamConverter("muscle", options: ["id" => "idMuscle"])]
-    public function getMuscle(SerializerInterface $serializer, MuscleRepository $repository, int $idMuscle, Muscle $muscle): JsonResponse
+    public function getMuscle(SerializerInterface $serializer, Muscle $muscle, TagAwareCacheInterface $cache): JsonResponse
     {
-//        $muscle = $repository->findOneBy(array('id' => $idMuscle));
-        $context = SerializationContext::create()->setGroups(['getMuscle']);
-        $jsonMuscle = $serializer->serialize($muscle, 'json', $context);
-        return new JsonResponse($jsonMuscle, Response::HTTP_OK,[], true);
+        $idCache = 'getMuscle' . $muscle->getId();
+        $data = $cache->get($idCache, function (ItemInterface $item) use ($muscle, $serializer) {
+            echo 'Cache saved';
+            $item->tag('muscleCache');
+            $context = SerializationContext::create()->setGroups(['getMuscle,getMuscleAll']);
+            return $serializer->serialize($muscle, 'json', $context);
+        });
+//        dd($data);
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 
+
+    #[Route('/api/restaurant/{idRestaurant}', name: 'restaurant.getOne', methods: ['GET'])]
+    #[ParamConverter('restaurant', options: ['id' => 'idRestaurant'])]
+    public function getOneRestaurant(Restaurant $restaurant, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
+    {
+        $idCache = 'getOneRestaurant' . $restaurant->getId();
+        $data = $cache->get($idCache, function (ItemInterface $item) use ($restaurant, $serializer) {
+            echo 'Cache saved 🧙‍♂️';
+            $item->tag('restaurantCache');
+            $context = SerializationContext::create()->setGroups(['showRestaurant']);
+            return $serializer->serialize($restaurant, 'json', $context);
+        });
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
+
+
     #[Route('/api/muscle/{idMuscle}', name: 'muscle.delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_ADMIN', message: 'il faut être admin')]
+    #[IsGranted('ROLE_ADMIN', message: 'y faut être admin')]
     #[ParamConverter("muscle", options: ["id" => "idMuscle"])]
     public function deleteMuscle(SerializerInterface $serializer, Muscle $muscle, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache): JsonResponse
     {
@@ -87,7 +98,7 @@ class MuscleController extends AbstractController
     }
 
     #[Route('/api/muscle', name: 'muscle.create', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN', message: 'il faut être admin')]
+    #[IsGranted('ROLE_ADMIN', message: 'y faut être admin')]
     #[ParamConverter("muscle", options: ["id" => "idMuscle"])]
     public function createMuscle(RegionRepository $regionRepository, ValidatorInterface $validator, EntityManagerInterface $entityManager, Request $request, SerializerInterface $serializer, UrlGeneratorInterface $urlGenerator): JsonResponse
     {
@@ -111,7 +122,7 @@ class MuscleController extends AbstractController
     }
 
     #[Route('/api/leCache', name: 'muscle.cache', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN', message: 'il faut être admin')]
+    #[IsGranted('ROLE_ADMIN', message: 'y faut être admin')]
     public function jcp(TagAwareCacheInterface $cache, Request $request, SerializerInterface $serializer,MuscleRepository $repository): JsonResponse
     {
         $idCache = 'getAllMuscle';
@@ -125,7 +136,7 @@ class MuscleController extends AbstractController
     }
 
     #[Route('/api/muscleUpdate/{idMuscle}', name: 'muscle.update', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN', message: 'il faut être admin')]
+    #[IsGranted('ROLE_ADMIN', message: 'y faut être admin')]
     #[ParamConverter("muscle", options: ["id" => "idMuscle"])]
     public function updateMuscle(RegionRepository $regionRepository, ValidatorInterface $validator, EntityManagerInterface $entityManager, Request $request, SerializerInterface $serializer, UrlGeneratorInterface $urlGenerator, Muscle $muscle): JsonResponse
     {
@@ -151,4 +162,3 @@ class MuscleController extends AbstractController
         return new JsonResponse($jsonMuscle, Response::HTTP_CREATED, ["location" => $location], true);
     }
 }
-

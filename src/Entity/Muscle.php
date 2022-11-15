@@ -2,31 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\MuscleRepository;
+use App\Repository\TestEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
-
-use Hateoas\Configuration\Annotation as Hateoas;
-use Hateoas\Configuration\Annotation\Relation;
-use Hateoas\Configuration\Annotation\Route;
-use Hateoas\Configuration\Annotation\Exclusion;
-
-/**
- * @Relation(
- *     "self",
- *     href=@Route(
- *     "muscle.get",
- *     parameters= {
- *     "idMuscle" = "exprt(object.getId())"
- *     }
- *     ),
- *     exclusion = @Exclusion(groups="getMuscle")
- *    )
- */
-
 
 #[ORM\Entity(repositoryClass: MuscleRepository::class)]
 class Muscle
@@ -58,21 +38,7 @@ class Muscle
     #[Groups(['getMuscle','getMuscleAll','createMuscle'])]
     private ?string $status = null;
 
-    #[ORM\ManyToOne(inversedBy: 'RegionID')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Region $regionID = null;
 
-    #[ORM\ManyToMany(targetEntity: Exercice::class, mappedBy: 'muscleID')]
-    private Collection $exercices;
-
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Picture $pictureID = null;
-
-    #[ORM\OneToMany(mappedBy: 'muscleExercice', targetEntity: ExerciceMuscle::class)]
-    private Collection $exerciceMuscles;
-
-    #[ORM\ManyToMany(targetEntity: Exercice::class, mappedBy: 'idMuscle')]
-    private Collection $exercice;
 
     public function __construct()
     {
@@ -98,17 +64,6 @@ class Muscle
         return $this;
     }
 
-    public function getRegionID(): ?Region
-    {
-        return $this->regionID;
-    }
-
-    public function setRegionID(?Region $regionID): self
-    {
-        $this->regionID = $regionID;
-
-        return $this;
-    }
 
     public function getStatus(): ?string
     {
@@ -122,32 +77,7 @@ class Muscle
         return $this;
     }
 
-    /**
-     * @return Collection<int, Exercice>
-     */
-    public function getExercices(): Collection
-    {
-        return $this->exercices;
-    }
 
-    public function addExercice(Exercice $exercice): self
-    {
-        if (!$this->exercices->contains($exercice)) {
-            $this->exercices->add($exercice);
-            $exercice->addMuscleID($this);
-        }
-
-        return $this;
-    }
-
-    public function removeExercice(Exercice $exercice): self
-    {
-        if ($this->exercices->removeElement($exercice)) {
-            $exercice->removeMuscleID($this);
-        }
-
-        return $this;
-    }
 
     public function getPictureID(): ?Picture
     {
@@ -161,41 +91,5 @@ class Muscle
         return $this;
     }
 
-    /**
-     * @return Collection<int, ExerciceMuscle>
-     */
-    public function getExerciceMuscles(): Collection
-    {
-        return $this->exerciceMuscles;
-    }
 
-    public function addExerciceMuscle(ExerciceMuscle $exerciceMuscle): self
-    {
-        if (!$this->exerciceMuscles->contains($exerciceMuscle)) {
-            $this->exerciceMuscles->add($exerciceMuscle);
-            $exerciceMuscle->setMuscleExercice($this);
-        }
-
-        return $this;
-    }
-
-    public function removeExerciceMuscle(ExerciceMuscle $exerciceMuscle): self
-    {
-        if ($this->exerciceMuscles->removeElement($exerciceMuscle)) {
-            // set the owning side to null (unless already changed)
-            if ($exerciceMuscle->getMuscleExercice() === $this) {
-                $exerciceMuscle->setMuscleExercice(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Exercice>
-     */
-    public function getExercice(): Collection
-    {
-        return $this->exercice;
-    }
 }

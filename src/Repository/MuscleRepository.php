@@ -7,7 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Muscle>
+ * @extends ServiceEntityRepository<TestEntity>
  *
  * @method Muscle|null find($id, $lockMode = null, $lockVersion = null)
  * @method Muscle|null findOneBy(array $criteria, array $orderBy = null)
@@ -40,35 +40,29 @@ class MuscleRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Muscle[] Returns an array of Muscle objects
+//     * @return TestEntity[] Returns an array of TestEntity objects
 //     */
 //    public function findByExampleField($value): array
 //    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
+//        return $this->createQueryBuilder('t')
+//            ->andWhere('t.exampleField = :val')
 //            ->setParameter('val', $value)
-//            ->orderBy('m.id', 'ASC')
+//            ->orderBy('t.id', 'ASC')
 //            ->setMaxResults(10)
 //            ->getQuery()
 //            ->getResult()
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Muscle
+//    public function findOneBySomeField($value): ?TestEntity
 //    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
+//        return $this->createQueryBuilder('t')
+//            ->andWhere('t.exampleField = :val')
 //            ->setParameter('val', $value)
 //            ->getQuery()
 //            ->getOneOrNullResult()
 //        ;
 //    }
-
-//   public function checkStatus($status) {
-//       $qb = $this->createQueryBuilder('m')
-//           ->andWhere('m.status = :status')
-//           ->setParameter('status', 'on');
-//   }
 
     /**
      *
@@ -86,5 +80,5 @@ class MuscleRepository extends ServiceEntityRepository
         $qb->setMaxResults($limit);
         return $qb->getQuery()->getResult();
     }
-}
 
+}
