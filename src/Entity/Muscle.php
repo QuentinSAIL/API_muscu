@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\TestEntityRepository;
+use App\Repository\MuscleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -33,19 +33,13 @@ class Muscle
     #[ORM\Column(length: 20)]
     #[Assert\Choice(
         choices: ['on','off'],
-        message: 'on on a dit',
+        message: '"on" on a dit',
     )]
     #[Groups(['getMuscle','getMuscleAll','createMuscle'])]
     private ?string $status = null;
 
-
-
-    public function __construct()
-    {
-        $this->exercices = new ArrayCollection();
-        $this->exerciceMuscles = new ArrayCollection();
-        $this->exercice = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(inversedBy: 'idmuscle')]
+    private ?Region $regionId = null;
 
     public function getId(): ?int
     {
@@ -64,7 +58,6 @@ class Muscle
         return $this;
     }
 
-
     public function getStatus(): ?string
     {
         return $this->status;
@@ -77,16 +70,14 @@ class Muscle
         return $this;
     }
 
-
-
-    public function getPictureID(): ?Picture
+    public function getRegionId(): ?Region
     {
-        return $this->pictureID;
+        return $this->regionId;
     }
 
-    public function setPictureID(?Picture $pictureID): self
+    public function setRegionId(?Region $regionId): self
     {
-        $this->pictureID = $pictureID;
+        $this->regionId = $regionId;
 
         return $this;
     }

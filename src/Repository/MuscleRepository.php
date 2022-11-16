@@ -7,7 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<TestEntity>
+ * @extends ServiceEntityRepository<Muscle>
  *
  * @method Muscle|null find($id, $lockMode = null, $lockVersion = null)
  * @method Muscle|null findOneBy(array $criteria, array $orderBy = null)
@@ -66,9 +66,9 @@ class MuscleRepository extends ServiceEntityRepository
 
     /**
      *
-     * retourne les étudiants paginée
+     * retourne les muscles paginée
      * @param $page
-     * @param $limit d'étudiant par page
+     * @param $limit //de muscle par page
      * @return array
      */
 

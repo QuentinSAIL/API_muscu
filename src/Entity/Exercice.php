@@ -57,6 +57,4 @@ class Exercice
 
         return $this;
     }
-
-
 }
