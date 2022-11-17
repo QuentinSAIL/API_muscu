@@ -6,7 +6,7 @@ use App\Repository\MuscleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MuscleRepository::class)]
 class Muscle
@@ -14,7 +14,7 @@ class Muscle
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getMuscle','getMuscleAll'])]
+    #[Groups(['getMuscle'])]
     private ?int $id = null;
 
 
@@ -27,7 +27,7 @@ class Muscle
         minMessage: 'met plus long, minimum : {{limit}}',
         maxMessage: 'met moins long, max : {{limit}}',
     )]
-    #[Groups(['getMuscle','getMuscleAll','createMuscle'])]
+    #[Groups(['getMuscle'])]
     private ?string $muscleName = null;
 
     #[ORM\Column(length: 20)]
@@ -35,11 +35,19 @@ class Muscle
         choices: ['on','off'],
         message: '"on" on a dit',
     )]
-    #[Groups(['getMuscle','getMuscleAll','createMuscle'])]
+    #[Groups(['getMuscle'])]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'idmuscle')]
     private ?Region $regionId = null;
+
+    #[ORM\ManyToMany(targetEntity: Exercice::class, mappedBy: 'idMuscle')]
+    private Collection $exercices;
+
+    public function __construct()
+    {
+        $this->exercices = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -78,6 +86,33 @@ class Muscle
     public function setRegionId(?Region $regionId): self
     {
         $this->regionId = $regionId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Exercice>
+     */
+    public function getExercices(): Collection
+    {
+        return $this->exercices;
+    }
+
+    public function addExercice(Exercice $exercice): self
+    {
+        if (!$this->exercices->contains($exercice)) {
+            $this->exercices->add($exercice);
+            $exercice->addIdMuscle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExercice(Exercice $exercice): self
+    {
+        if ($this->exercices->removeElement($exercice)) {
+            $exercice->removeIdMuscle($this);
+        }
 
         return $this;
     }

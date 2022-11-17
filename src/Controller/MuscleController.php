@@ -43,20 +43,20 @@ class MuscleController extends AbstractController
      * @return JsonResponse
      */
 
-    #[OA\Tag(name: 'Muscle')]
+    #[OA\Tag(name: 'Muscles')]
     #[OA\Response(response: '200', description: 'OK')]
     #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/muscles', name: 'muscles.getAll', methods: ['GET'],)]
     #[IsGranted('ROLE_ADMIN', message: 'y faut être admin')]
     public function getAllMuscle(MuscleRepository $repository, SerializerInterface $serializer, Request $request): JsonResponse
     {
-        //$muscles = $repository->findAll();
+//        $muscles = $repository->findAll();
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 5);
         $limit = $limit > 20 ? 20 : $limit;
         $muscles = $repository->findWithPagination($page, $limit);
-        $JsonMuscles = $serializer->serialize($muscles, 'json');
-//        dd($JsonMuscles);
+        $context = SerializationContext::create()->setGroups(['getMuscle']);
+        $JsonMuscles = $serializer->serialize($muscles, 'json', $context);
         return new JsonResponse($JsonMuscles, Response::HTTP_OK, [], true);
     }
 
@@ -85,7 +85,8 @@ class MuscleController extends AbstractController
 //            $context = SerializationContext::create()->setGroups(['getMuscle,getMuscleAll']);
 //            return $serializer->serialize($muscle, 'json', $context);
 //        });
-        $muscleJson = $serializer->serialize($muscle,'json');
+        $context = SerializationContext::create()->setGroups(['getMuscle']);
+        $muscleJson = $serializer->serialize($muscle,'json', $context);
         return new JsonResponse($muscleJson, Response::HTTP_OK, [], true);
     }
 
@@ -129,7 +130,7 @@ class MuscleController extends AbstractController
         $muscle->setMuscleName($content["muscleName"]);
         $errors = $validator->validate($muscle);
         if ($errors->count() > 0) {
-            return new JsonResponse($serializer->serialize($errors, 'json', [AbstractNormalizer::GROUPS => 'createMuscle']), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse($serializer->serialize($errors, 'json', [AbstractNormalizer::GROUPS => 'getMuscle']), Response::HTTP_BAD_REQUEST, [], true);
         }
 
         $entityManager->persist($muscle);
@@ -138,20 +139,6 @@ class MuscleController extends AbstractController
         $jsonMuscle = $serializer->serialize($muscle, "json");
         return new JsonResponse($jsonMuscle, Response::HTTP_CREATED, ["location" => $location], true);
     }
-
-//    #[Route('/api/leTestDuCache', name: 'muscle.cache', methods: ['GET'])]
-//    #[IsGranted('ROLE_ADMIN', message: 'y faut être admin')]
-//    public function jcp(TagAwareCacheInterface $cache, Request $request, SerializerInterface $serializer,MuscleRepository $repository): JsonResponse
-//    {
-//        $idCache = 'getAllMuscle';
-//        $jsonMuscles = $cache->get($idCache, function (ItemInterface $item) use($repository,$serializer){
-//            echo "Mise en cache";
-//            $item->tag("MuscleCache");
-//            $muscles = $repository->findAll();
-//            return $serializer->serialize($muscles, 'json', [AbstractNormalizer::GROUPS => 'getMuscle']);
-//        });
-//        return new JsonResponse($jsonMuscles, Response::HTTP_OK, [], true);
-//    }
 
     /**
      * Renvoie le muscle modifié
@@ -183,7 +170,22 @@ class MuscleController extends AbstractController
         $entityManager->persist($muscle);
         $entityManager->flush();
         $location = $urlGenerator->generate("muscle.get", ['idMuscle' => $muscle->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $jsonMuscle = $serializer->serialize($muscle, "json", [AbstractNormalizer::GROUPS => 'createMuscle']);
+        $jsonMuscle = $serializer->serialize($muscle, "json", [AbstractNormalizer::GROUPS => 'getMuscle']);
         return new JsonResponse($jsonMuscle, Response::HTTP_CREATED, ["location" => $location], true);
     }
+
+    //    #[Route('/api/leTestDuCache', name: 'muscle.cache', methods: ['GET'])]
+//    #[IsGranted('ROLE_ADMIN', message: 'y faut être admin')]
+//    public function jcp(TagAwareCacheInterface $cache, Request $request, SerializerInterface $serializer,MuscleRepository $repository): JsonResponse
+//    {
+//        $idCache = 'getAllMuscle';
+//        $jsonMuscles = $cache->get($idCache, function (ItemInterface $item) use($repository,$serializer){
+//            echo "Mise en cache";
+//            $item->tag("MuscleCache");
+//            $muscles = $repository->findAll();
+//            return $serializer->serialize($muscles, 'json', [AbstractNormalizer::GROUPS => 'getMuscle']);
+//        });
+//        return new JsonResponse($jsonMuscles, Response::HTTP_OK, [], true);
+//    }
+
 }

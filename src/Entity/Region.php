@@ -6,6 +6,7 @@ use App\Repository\RegionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RegionRepository::class)]
 class Region
@@ -13,11 +14,14 @@ class Region
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getRegion'])]
     private ?int $id = null;
 
+    #[Groups(['getRegion'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Groups(['getRegion'])]
     #[ORM\Column(length: 255)]
     private ?string $status = null;
 
@@ -29,6 +33,7 @@ class Region
         $this->idmuscle = new ArrayCollection();
     }
 
+     #[Groups(['getMuscle','getMuscleAll','createMuscle'])]
     public function getId(): ?int
     {
         return $this->id;
