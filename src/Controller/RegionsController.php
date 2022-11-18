@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Region;
 use App\Entity\Muscle;
+use OpenApi\Attributes as OA;
 use App\Repository\RegionRepository;
 use App\Repository\MuscleRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,6 +31,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class RegionsController extends AbstractController
 {
+    
     #[Route('/regions', name: 'app_regions')]
     public function index(): JsonResponse
     {
@@ -44,9 +46,11 @@ class RegionsController extends AbstractController
      * /**Retourne la liste des regions
      * @param RegionRepository $repository
      * @param SerializerInterface $serializer
-     * @param Request $request à besoin de paramétrer $limit et $page
      * @return JsonResponse
      */
+    #[OA\Tag(name: 'Region')]
+    #[OA\Response(response: '200', description: 'OK')]
+    #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/regions', name: 'regions.getAll', methods: ['GET'],)]
     #[IsGranted('ROLE_ADMIN', message: 'il faut être administrateur')]
     public function getAllRegion(RegionRepository $repository,
@@ -59,6 +63,16 @@ class RegionsController extends AbstractController
         return new JsonResponse($JsonRegion, Response::HTTP_OK, [], true);
 
     }
+    /**
+     * /**Retourne d'une region en foncton de l'id de la region 
+     * @param RegionRepository $repository
+     * @param SerializerInterface $serializer
+     * @param Request $request à besoin de paramétrer $limit et $page
+     * @return JsonResponse
+     */
+    #[OA\Tag(name: 'Region')]
+    #[OA\Response(response: '200', description: 'OK')]
+    #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/region/{idRegion}', name: 'region.get', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'il faut être administrateur')]
     public function getRegion(
@@ -72,8 +86,20 @@ class RegionsController extends AbstractController
         $regionJSON = $serializer->serialize($region, 'json', $context);
         return new JsonResponse($regionJSON, Response::HTTP_OK, [], true);
     }
+    /**
+     * /**envoie une seul region avec l'id passer dans l'URL
+     * @param Region $region
+     * @param ValidatorInterface $validator
+     * @param EntityManagerInterface $manager
+     * @param SerializerInterface $serializer
+     * @param Request $request à besoin de paramétrer $limit et $page
+     * @param UrlGeneratorInterface $urlGenerator
+     * @return JsonResponse
+     */
 
-
+    #[OA\Tag(name: 'Region')]
+    #[OA\Response(response: '200', description: 'OK')]
+    #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/regionUpdate/{idRegion}', name: 'region.update', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'il faut être administrateur')]
     #[ParamConverter("region", options: ["id" => "idRegion"])]

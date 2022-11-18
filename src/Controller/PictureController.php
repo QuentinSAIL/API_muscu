@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Picture;
+use OpenApi\Attributes as OA;
 use App\Repository\PictureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,6 +27,17 @@ class PictureController extends AbstractController
         ]);
     }
 
+    /**
+     * /**Retourne la une picture en fonction de la localisation
+     * @param PictureRepository $repository
+     * @param SerializerInterface $serializer
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param Request $request 
+     * @return JsonResponse
+     */
+    #[OA\Tag(name: 'Picture')]
+    #[OA\Response(response: '200', description: 'OK')]
+    #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/pictures/{idPicture}', name: 'pictures.get', methods: ['GET'], )]
     public function getPicture(int $idPicture, Request $request, PictureRepository $pictureRepository,SerializerInterface $serializer,UrlGeneratorInterface $urlGenerator) : JsonResponse
     {
@@ -39,7 +51,18 @@ class PictureController extends AbstractController
         }
         return new JsonResponse(null, Response::HTTP_NOT_FOUND);
     }
-
+    /**
+     * /**envoie une seul picture avec l'id passer dans l'URL
+     * @param ValidatorInterface $validator
+     * @param EntityManagerInterface $entitymanager
+     * @param SerializerInterface $serializer
+     * @param Request $request 
+     * @param UrlGeneratorInterface $urlGenerator
+     * @return JsonResponse
+     */
+    #[OA\Tag(name: 'Picture')]
+    #[OA\Response(response: '200', description: 'OK')]
+    #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/pictures', name: 'pictures.create', methods: ['POST'], )]
     public function createPicture(ValidatorInterface $validator,
                                   EntityManagerInterface $entityManager,

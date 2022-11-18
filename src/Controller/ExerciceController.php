@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 use App\Entity\Exercice;
+use OpenApi\Attributes as OA;
 use App\Repository\ExerciceRepository;
 use App\Repository\MuscleRepository;
 use App\Repository\RegionRepository;
@@ -24,7 +25,16 @@ class ExerciceController extends AbstractController
             'path' => 'src/Controller/ExerciceController.php',
         ]);
     }
+     /**
+     * Retourne la liste de tout les exercices 
+     * @param ExerciceRepository $repository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
 
+    #[OA\Tag(name: 'Exercices')]
+    #[OA\Response(response: '200', description: 'OK')]
+    #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/exercices', name: 'exercices.getAll')]
     public function getAllExercice(ExerciceRepository $repository, SerializerInterface $serializer) : JsonResponse
     {
@@ -32,7 +42,16 @@ class ExerciceController extends AbstractController
         $JsonExercices = $serializer->serialize($exercices, 'json');
         return new JsonResponse($JsonExercices, Response::HTTP_OK,[],true);
     }
+    /**
+     * Renvoie un exercice avec l'id passer dans l'URL
+     * @param Exercice $exercices
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
 
+    #[OA\Tag(name: 'Exercices')]
+    #[OA\Response(response: '200', description: 'OK')]
+    #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/exercice/{idExercice}', name: 'exercice.get', methods: ['GET'])]
     #[ParamConverter("exercice",options: ["id" => "idExercice"])]
     public function getExercice(SerializerInterface $serializer,Exercice $exercice) : JsonResponse
@@ -41,7 +60,17 @@ class ExerciceController extends AbstractController
         $jsonExercice = $serializer->serialize($exercice,'json', [$context]);
         return new JsonResponse($jsonExercice, Response::HTTP_OK,["accept"=>"json"],true);
     }
+    /**
+     * Renvoie un exercice avec l'id du muscle  passer dans l'URL
+     * @param MuscleRepository $MuscleRepository
+     * @param ExerciceRepository $ExerciceRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
 
+    #[OA\Tag(name: 'Exercices')]
+    #[OA\Response(response: '200', description: 'OK')]
+    #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/exerciceByMuscle/{idMuscle}', name: 'exerciceByMuscle.get', methods: ['GET'])]
     public function getExerciceByMuscle(SerializerInterface $serializer,int $idMuscle, MuscleRepository $MuscleRepository, ExerciceRepository $ExerciceRepository) : JsonResponse
     {
@@ -57,6 +86,17 @@ class ExerciceController extends AbstractController
         $programmeJSON = $serializer->serialize($programme,'json');
         return new JsonResponse($programmeJSON, Response::HTTP_OK,["accept"=>"json"],true);
     }
+      /**
+     * Renvoie un exercice avec l'id de la region passer dans l'URL
+     * @param MuscleRepository $MuscleRepository
+     * @param RegionRepository $regionRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+
+    #[OA\Tag(name: 'Exercices')]
+    #[OA\Response(response: '200', description: 'OK')]
+    #[OA\Response(response: '401', description: 'Unauthorized')]
 
     #[Route('/api/exerciceByRegion/{idRegion}', name: 'exerciceByRegion.get', methods: ['GET'])]
     public function exerciceByRegion(SerializerInterface $serializer,int $idRegion, MuscleRepository $MuscleRepository, RegionRepository $regionRepository) : JsonResponse
