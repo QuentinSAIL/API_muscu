@@ -43,7 +43,7 @@ class MuscleController extends AbstractController
      * @return JsonResponse
      */
 
-    #[OA\Tag(name: 'Muscles')]
+    #[OA\Tag(name: 'Muscle')]
     #[OA\Response(response: '200', description: 'OK')]
     #[OA\Response(response: '401', description: 'Unauthorized')]
     #[Route('/api/muscles', name: 'muscles.getAll', methods: ['GET'],)]
@@ -115,6 +115,12 @@ class MuscleController extends AbstractController
 
     /**
      * Renvoie le muscle créée
+     * @param RegionRepository $regionRepository
+     * @param SerializerInterface $serializer
+     * @param ValidatorInterface $validator
+     * @param EntityManagerInterface $entityManager
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param Request $request
      * @return JsonResponse
      */
     #[OA\Tag(name: 'Muscle')]
@@ -130,7 +136,8 @@ class MuscleController extends AbstractController
         $muscle->setMuscleName($content["muscleName"]);
         $errors = $validator->validate($muscle);
         if ($errors->count() > 0) {
-            return new JsonResponse($serializer->serialize($errors, 'json', [AbstractNormalizer::GROUPS => 'getMuscle']), Response::HTTP_BAD_REQUEST, [], true);
+            $context = SerializationContext::create()->setGroups(['getMuscle']);
+            return new JsonResponse($serializer->serialize($errors, 'json', $context), Response::HTTP_BAD_REQUEST, [], true);
         }
 
         $entityManager->persist($muscle);
@@ -142,6 +149,13 @@ class MuscleController extends AbstractController
 
     /**
      * Renvoie le muscle modifié
+     * @return JsonResponse
+     * @param RegionRepository $regionRepository
+     * @param SerializerInterface $serializer
+     * @param ValidatorInterface $validator
+     * @param EntityManagerInterface $entityManager
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param Request $request
      * @return JsonResponse
      */
     #[OA\Tag(name: 'Muscle')]
@@ -164,13 +178,15 @@ class MuscleController extends AbstractController
 
         $errors = $validator->validate($muscle);
         if ($errors->count() > 0) {
-            return new JsonResponse($serializer->serialize($errors, 'json', [AbstractNormalizer::GROUPS => 'createMuscle']), Response::HTTP_BAD_REQUEST, [], true);
+            $context = SerializationContext::create()->setGroups(['getMuscle']);
+            return new JsonResponse($serializer->serialize($errors, 'json', $context, Response::HTTP_BAD_REQUEST, [], true));
         }
 
         $entityManager->persist($muscle);
         $entityManager->flush();
         $location = $urlGenerator->generate("muscle.get", ['idMuscle' => $muscle->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $jsonMuscle = $serializer->serialize($muscle, "json", [AbstractNormalizer::GROUPS => 'getMuscle']);
+        $context = SerializationContext::create()->setGroups(['getMuscle']);
+        $jsonMuscle = $serializer->serialize($muscle, "json", $context);
         return new JsonResponse($jsonMuscle, Response::HTTP_CREATED, ["location" => $location], true);
     }
 

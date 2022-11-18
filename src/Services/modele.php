@@ -6,7 +6,7 @@ class modele
 
     public function __construct()
     {
-        $this->connexion = new PDO('mysql:host=127.0.0.1;dbname=api_muscu_copy_teach', "root", "", array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+        $this->connexion = new PDO('mysql:host=127.0.0.1;dbname=api_muscu', "root", "", array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
     }
 
     public function getExerciceByMuscle($IDmuscle)

@@ -26,7 +26,7 @@ class ExerciceController extends AbstractController
         ]);
     }
      /**
-     * Retourne la liste de tout les exercices 
+     * Retourne la liste de tout les exercices
      * @param ExerciceRepository $repository
      * @param SerializerInterface $serializer
      * @return JsonResponse
@@ -35,11 +35,12 @@ class ExerciceController extends AbstractController
     #[OA\Tag(name: 'Exercices')]
     #[OA\Response(response: '200', description: 'OK')]
     #[OA\Response(response: '401', description: 'Unauthorized')]
-    #[Route('/api/exercices', name: 'exercices.getAll')]
+    #[Route('/api/exercices', name: 'exercices.getAll',  methods: ['GET'])]
     public function getAllExercice(ExerciceRepository $repository, SerializerInterface $serializer) : JsonResponse
     {
         $exercices = $repository->findAll();
-        $JsonExercices = $serializer->serialize($exercices, 'json');
+        $context = SerializationContext::create()->setGroups('getExercice');
+        $JsonExercices = $serializer->serialize($exercices, 'json', [$context]);
         return new JsonResponse($JsonExercices, Response::HTTP_OK,[],true);
     }
     /**
@@ -58,10 +59,10 @@ class ExerciceController extends AbstractController
     {
         $context = SerializationContext::create()->setGroups(['getExercice']);
         $jsonExercice = $serializer->serialize($exercice,'json', [$context]);
-        return new JsonResponse($jsonExercice, Response::HTTP_OK,["accept"=>"json"],true);
+        return new JsonResponse($jsonExercice, Response::HTTP_OK,[],true);
     }
     /**
-     * Renvoie un exercice avec l'id du muscle  passer dans l'URL
+     * Renvoie un programme avec l'id du muscle  passer dans l'URL
      * @param MuscleRepository $MuscleRepository
      * @param ExerciceRepository $ExerciceRepository
      * @param SerializerInterface $serializer
@@ -77,17 +78,21 @@ class ExerciceController extends AbstractController
         $muscle = $MuscleRepository->findOneBy(['id' => $idMuscle]);
         $BDD = new \modele();
         $exerciceMuscle[] = $BDD->getExerciceByMuscle($idMuscle);
-        $programme = 'Pour travailler le '.$muscle->getMuscleName().' il faut faire : ';
+        $programme = 'Pour travailler ce muscle : ( '.$muscle->getMuscleName().' ) --> il faut faire : ';
         $i = 0;
         while (isset($exerciceMuscle[0][$i])) {
-            $programme.= rand(2,4).' repetition de '.$exerciceMuscle[0][$i]["name"].', ';
+            if ($i<>0) {
+                $programme.= ', ';
+            }
+            $programme.= rand(2,4).' séries de 10 repetitions de l exercice : ('.$exerciceMuscle[0][$i]["name"].')';
             $i++;
         }
+        $context = SerializationContext::create()->setGroups(['getMuscle']);
         $programmeJSON = $serializer->serialize($programme,'json');
         return new JsonResponse($programmeJSON, Response::HTTP_OK,["accept"=>"json"],true);
     }
       /**
-     * Renvoie un exercice avec l'id de la region passer dans l'URL
+     * Renvoie un programme avec l'id de la region passer dans l'URL
      * @param MuscleRepository $MuscleRepository
      * @param RegionRepository $regionRepository
      * @param SerializerInterface $serializer
@@ -104,13 +109,13 @@ class ExerciceController extends AbstractController
         $region = $regionRepository->findOneBy(['id' => $idRegion]);
         $BDD = new \modele();
         $exerciceMuscle[] = $BDD->getExerciceByRegion($idRegion);
-        $programme = 'Pour travailler le '.$region->getName().' il faut faire : ';
+        $programme = 'Pour travailler cette region : ( '.$region->getName().' ) --> il faut faire : ';
         $i = 0;
         while (isset($exerciceMuscle[0][$i])) {
             if ($i<>0) {
                 $programme.= ', ';
             }
-            $programme.= rand(2,4).' repetitions de '.$exerciceMuscle[0][$i]["name"];
+            $programme.= rand(2,4).' séries de '.rand(8,12).' repetitions de l exercice : ('.$exerciceMuscle[0][$i]["name"].')';
             $i++;
         }
         $programmeJSON = $serializer->serialize($programme,'json');

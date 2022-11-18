@@ -67,7 +67,7 @@ class RegionsController extends AbstractController
      * /**Retourne d'une region en foncton de l'id de la region 
      * @param RegionRepository $repository
      * @param SerializerInterface $serializer
-     * @param Request $request à besoin de paramétrer $limit et $page
+     * @param Request $request
      * @return JsonResponse
      */
     #[OA\Tag(name: 'Region')]
@@ -92,7 +92,7 @@ class RegionsController extends AbstractController
      * @param ValidatorInterface $validator
      * @param EntityManagerInterface $manager
      * @param SerializerInterface $serializer
-     * @param Request $request à besoin de paramétrer $limit et $page
+     * @param Request $request
      * @param UrlGeneratorInterface $urlGenerator
      * @return JsonResponse
      */
