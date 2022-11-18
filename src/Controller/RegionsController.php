@@ -129,7 +129,8 @@ class RegionsController extends AbstractController
         $entityManager->persist($region);
         $entityManager->flush();
         $location = $urlGenerator->generate("region.get", ['idRegion' => $region->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $jsonRegion = $serializer->serialize($region, "json", [AbstractNormalizer::GROUPS => 'createRegion']);
+        $context = SerializationContext::create()->setGroups(['getRegion']);
+        $jsonRegion = $serializer->serialize($region, "json", $context);
         return new JsonResponse($jsonRegion, Response::HTTP_CREATED, ["location" => $location], true);
     }
 
